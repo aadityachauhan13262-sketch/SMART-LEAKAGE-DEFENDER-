@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Leakage Defender | Dashboard</title>
+<style>
+:root{--bg:#0b1220;--panel:#121d30;--panel2:#17243a;--text:#edf4ff;--muted:#9aabc4;--line:#263750;--green:#35d39a;--red:#ff6376;--yellow:#ffc857;--blue:#62a8ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0%,#182b48 0,#0b1220 42%);color:var(--text);font:15px/1.5 Arial,sans-serif}
+header{padding:22px 5%;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#2474bd,#35d39a);display:grid;place-items:center;font-size:23px}
+h1{font-size:20px;margin:0}header p{margin:2px 0 0;color:var(--muted);font-size:12px}.pill{padding:7px 12px;border:1px solid var(--line);border-radius:30px;color:var(--green);font-size:12px}
+main{max-width:1250px;margin:26px auto;padding:0 20px}.topline{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:18px}h2{font-size:23px;margin:0}.sub{color:var(--muted);font-size:13px;margin-top:4px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.card,.panel{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 10px 30px #0002}
+.metric-head{display:flex;justify-content:space-between;color:var(--muted);font-size:13px}.metric{font-size:30px;font-weight:700;margin:13px 0 2px}.unit{font-size:14px;color:var(--muted);font-weight:400}.hint{font-size:12px;color:var(--muted)}.icon{font-size:20px}
+.content{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-top:14px}.panel h3{font-size:16px;margin:0 0 14px}.statusline{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#0c1728;border:1px solid var(--line);border-radius:12px;margin-bottom:12px}.status{font-weight:700;color:var(--green)}.status.danger{color:var(--red)}.status.warn{color:var(--yellow)}
+button{border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer;background:var(--blue);color:#071322}button.secondary{background:#263750;color:var(--text)}button.danger{background:var(--red);color:#21070c}button:focus{outline:2px solid white;outline-offset:2px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+canvas{width:100%;height:220px;display:block;background:#0c1728;border-radius:12px;border:1px solid var(--line)}
+.legend{display:flex;gap:15px;color:var(--muted);font-size:12px;margin:10px 0}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.pipeline{display:flex;align-items:center;gap:8px;margin:18px 0;padding:16px;background:#0c1728;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.pipe{height:12px;background:linear-gradient(90deg,#2879c8,#35d39a);border-radius:20px;flex:1;position:relative}.pipe.leak{background:linear-gradient(90deg,#2879c8,#ff6376)}.node{width:13px;height:13px;border:3px solid var(--blue);border-radius:50%;background:#0c1728;flex:none}.valve{padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:12px;white-space:nowrap}
+.log{max-height:190px;overflow:auto}.event{padding:9px 0;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}.event strong{color:var(--text)}
+.note{margin-top:18px;padding:13px 15px;border-radius:12px;background:#1c2a40;border:1px solid #314765;color:#c5d5eb;font-size:12px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:28px}
+@media(max-width:850px){.cards{grid-template-columns:repeat(2,1fr)}.content{grid-template-columns:1fr}}
+@media(max-width:460px){.cards{grid-template-columns:1fr}.metric{font-size:26px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo">🛡️</div><div><h1>SMART LEAKAGE DEFENDER</h1><p>IoT Pipeline Monitoring & Protection</p></div></div>
+ <div class="pill" id="connection">● DEMO SIMULATION ONLINE</div>
+</header>
+<main>
+ <div class="topline"><div><h2>Industrial Control Dashboard</h2><div class="sub">Pipeline P-01 · Sample demonstration data</div></div><div class="sub" id="clock">--</div></div>
+ <section class="cards">
+  <div class="card"><div class="metric-head"><span>🌡 Temperature</span><span>LIVE</span></div><div class="metric"><span id="temp">32.5</span><span class="unit"> °C</span></div><div class="hint">Pipeline fluid temperature</div></div>
+  <div class="card"><div class="metric-head"><span>◉ Pressure</span><span>LIVE</span></div><div class="metric"><span id="pressure">3.2</span><span class="unit"> bar</span></div><div class="hint">Internal pipeline pressure</div></div>
+  <div class="card"><div class="metric-head"><span>💧 Flow Rate</span><span>LIVE</span></div><div class="metric"><span id="flow">12.0</span><span class="unit"> L/min</span></div><div class="hint">Fluid flow rate</div></div>
+  <div class="card"><div class="metric-head"><span>🛡 Leakage Status</span><span>STATUS</span></div><div class="metric" style="font-size:23px" id="leakStatus">NORMAL</div><div class="hint" id="statusHint">No simulated leak detected</div></div>
+ </section>
+ <section class="content">
+  <div class="panel">
+   <h3>Pipeline Overview</h3>
+   <div class="statusline"><span>Pipeline condition</span><strong class="status" id="condition">● NORMAL</strong></div>
+   <div class="pipeline"><span class="node"></span><span class="pipe" id="pipeLine"></span><span class="node"></span><span class="valve" id="valve">VALVE: OPEN</span></div>
+   <div class="statusline"><span>Automatic shutoff</span><strong class="status" id="valveStatus">READY</strong></div>
+   <div class="actions"><button id="leakBtn" class="danger">Simulate Leakage</button><button id="resetBtn" class="secondary">Reset Normal</button></div>
+   <p class="hint">Press “Simulate Leakage” to demonstrate abnormal readings and automatic valve shutoff in this sample dashboard.</p>
+  </div>
+  <div class="panel">
+   <h3>System Alerts</h3>
+   <div class="log" id="log"><div class="event"><strong>System started</strong><br>Demo dashboard initialized.</div></div>
+  </div>
+ </section>
+ <section class="panel" style="margin-top:14px">
+  <h3>Live Sensor Trend (Demo)</h3>
+  <div class="legend"><span><i class="dot" style="background:#62a8ff"></i>Pressure (bar)</span><span><i class="dot" style="background:#35d39a"></i>Flow (scaled)</span></div>
+  <canvas id="chart" width="900" height="220"></canvas>
+ </section>
+ <div class="note"><strong>Important:</strong> This is a front-end demonstration using simulated values. It is not connected to an ESP32 or real sensors, and the valve status shown here does not operate physical equipment. For a real prototype, connect a properly designed ESP32 backend and appropriately rated, supervised valve driver.</div>
+</main>
+<footer>SMART LEAKAGE DEFENDER · DEMO DASHBOARD · Sample data only</footer>
+<script>
+const $=id=>document.getElementById(id);
+let leaking=false, pressure=3.2, flow=12, temp=32.5;
+let history=Array.from({length:30},()=>({p:3.2+(Math.random()-.5)*.15,f:12+(Math.random()-.5)}));
+function stamp(){return new Date().toLocaleTimeString();}
+function log(msg){const d=document.createElement('div');d.className='event';d.innerHTML='<strong>'+msg+'</strong><br>'+stamp();$('log').prepend(d);}
+function render(){
+ $('temp').textContent=temp.toFixed(1);$('pressure').textContent=pressure.toFixed(2);$('flow').textContent=flow.toFixed(1);
+ $('leakStatus').textContent=leaking?'LEAK DETECTED':'NORMAL';
+ $('leakStatus').style.color=leaking?'var(--red)':'var(--green)';
+ $('statusHint').textContent=leaking?'Abnormal pressure/flow in demo':'No simulated leak detected';
+ $('condition').textContent=leaking?'● ALERT':'● NORMAL';$('condition').className='status '+(leaking?'danger':'');
+ $('valve').textContent='VALVE: '+(leaking?'CLOSED':'OPEN');
+ $('valveStatus').textContent=leaking?'SHUTOFF ACTIVATED':'READY';$('valveStatus').className='status '+(leaking?'danger':'');
+ $('pipeLine').className='pipe'+(leaking?' leak':'');
+ draw();
+}
+function simulateLeak(){
+ if(leaking)return;leaking=true;pressure=1.35;flow=3.1;temp=34.2;
+ history.push({p:pressure,f:flow});history=history.slice(-30);render();
+ log('LEAKAGE ALERT — abnormal readings detected');
+ log('DEMO ACTION — valve status changed to CLOSED');
+}
+function reset(){
+ leaking=false;pressure=3.2;flow=12;temp=32.5;history.push({p:pressure,f:flow});history=history.slice(-30);render();log('System reset — normal demo state');
+}
+$('leakBtn').addEventListener('click',simulateLeak);$('resetBtn').addEventListener('click',reset);
+function draw(){
+ const c=$('chart'),ctx=c.getContext('2d'),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);
+ ctx.strokeStyle='#263750';ctx.lineWidth=1;
+ for(let i=1;i<5;i++){let y=i*h/5;ctx.beginPath();ctx.moveTo(40,y);ctx.lineTo(w-12,y);ctx.stroke();}
+ function line(key,color,min,max){ctx.beginPath();history.forEach((v,i)=>{let x=40+i*(w-55)/(history.length-1),y=h-20-(v[key]-min)/(max-min)*(h-40);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.strokeStyle=color;ctx.lineWidth=3;ctx.stroke();}
+ line('p','#62a8ff',0,5);line('f','#35d39a',0,20);
+}
+function tick(){ $('clock').textContent=new Date().toLocaleString(); if(!leaking){temp=32.5+(Math.random()-.5)*.5;pressure=3.2+(Math.random()-.5)*.12;flow=12+(Math.random()-.5)*.5;history.push({p:pressure,f:flow});history=history.slice(-30);render();}}
+setInterval(tick,1800);tick();render();
+</script>
+</body>
+</html>
